@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    /* Large readable type for a 35+ non-technical audience. */
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-surface-light text-slate-800 dark:bg-surface-dark dark:text-slate-100;
+    font-family:
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      Roboto,
+      'Helvetica Neue',
+      Arial,
+      sans-serif;
+  }
+
+  /* Visible focus rings for keyboard accessibility. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-navy-500 ring-offset-2 ring-offset-surface-light dark:ring-offset-surface-dark;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+}

@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: invoice-copilot-api
+    runtime: node
+    rootDir: backend
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start:prod
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: COOKIE_SAME_SITE
+        value: none
+      - key: MONGODB_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false
