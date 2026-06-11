@@ -1,7 +1,11 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { CHAT_HISTORY_WINDOW } from '../common/constants/app.constants';
+import {
+  CHAT_AUTO_TITLE_LENGTH,
+  CHAT_HISTORY_WINDOW,
+  DEFAULT_CHAT_TITLE,
+} from '../common/constants/app.constants';
 import { escapeRegex } from '../common/utils/sanitize.util';
 import { AgentService, AgentStreamHandlers } from './agent/agent.service';
 import { ChatMessage, ChatMessageDocument, ChatRole } from './schemas/chat-message.schema';
@@ -39,7 +43,7 @@ export class ChatService {
   async createSession(userId: string, title?: string): Promise<ChatSessionDocument> {
     return this.sessionModel.create({
       userId: new Types.ObjectId(userId),
-      title: title || 'New chat',
+      title: title || DEFAULT_CHAT_TITLE,
       lastMessageAt: new Date(),
     });
   }
@@ -128,8 +132,11 @@ export class ChatService {
     });
 
     // Auto-title brand-new sessions from the first user message.
-    if (priorCount === 0 && session.title === 'New chat') {
-      session.title = content.length > 60 ? `${content.slice(0, 57)}...` : content;
+    if (priorCount === 0 && session.title === DEFAULT_CHAT_TITLE) {
+      session.title =
+        content.length > CHAT_AUTO_TITLE_LENGTH
+          ? `${content.slice(0, CHAT_AUTO_TITLE_LENGTH - 3)}...`
+          : content;
     }
 
     const history = await this.messageModel

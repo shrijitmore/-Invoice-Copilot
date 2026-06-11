@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
+import { CSV_EXPORT_MAX_ROWS } from '../common/constants/app.constants';
 import { escapeRegex } from '../common/utils/sanitize.util';
 import { toCsv } from '../common/utils/csv.util';
 import { startOfDay } from '../common/utils/date.util';
@@ -245,7 +246,7 @@ export class InvoicesService {
     const invoices = await this.invoiceModel
       .find(filter)
       .sort({ createdAt: -1 })
-      .limit(10_000)
+      .limit(CSV_EXPORT_MAX_ROWS)
       .exec();
 
     const rows = invoices.map((inv) => [

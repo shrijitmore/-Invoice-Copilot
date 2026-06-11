@@ -9,11 +9,9 @@ import { Input } from '../components/ui/Input';
 import { Skeleton } from '../components/ui/Skeleton';
 import { useAuth } from '../context/AuthContext';
 import { api, getErrorMessage } from '../lib/api';
+import { ACCEPTED_AVATAR_MIME_TYPES, MAX_AVATAR_BYTES } from '../lib/constants';
 import { formatCurrency, formatDate } from '../lib/format';
 import type { AccountStats, UserProfile } from '../types/api';
-
-const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
-const AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
 
 /**
  * Profile page: edit display name, upload avatar, and view account stats.
@@ -59,7 +57,7 @@ export function ProfilePage(): JSX.Element {
     if (!file) {
       return;
     }
-    if (!AVATAR_TYPES.includes(file.type)) {
+    if (!ACCEPTED_AVATAR_MIME_TYPES.includes(file.type)) {
       toast.error('Avatar must be a PNG, JPEG or WebP image.');
       return;
     }

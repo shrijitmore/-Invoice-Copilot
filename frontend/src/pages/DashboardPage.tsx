@@ -22,20 +22,10 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
+import { STATUS_LABELS } from '../lib/constants';
 import { formatCurrency, formatDuration, formatMonthKey } from '../lib/format';
+import { chartColors, statusColors } from '../theme/colors';
 import type { DashboardAnalytics } from '../types/api';
-
-const STATUS_COLORS: Record<string, string> = {
-  paid: '#10b981',
-  unpaid: '#f59e0b',
-  overdue: '#ef4444',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  paid: 'Paid',
-  unpaid: 'Unpaid',
-  overdue: 'Overdue',
-};
 
 /**
  * Analytics dashboard: KPI cards plus top-vendor, trend, status and
@@ -142,11 +132,11 @@ export function DashboardPage(): JSX.Element {
           <h2 className="mb-4 font-semibold">Top 5 vendors by spend</h2>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={analytics.topVendors} layout="vertical" margin={{ left: 8, right: 16 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#94a3b833" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
               <XAxis type="number" tickFormatter={(value: number) => formatCurrency(value, currency)} fontSize={12} />
               <YAxis type="category" dataKey="vendor" width={110} fontSize={13} />
               <Tooltip formatter={(value) => formatCurrency(Number(value), currency)} />
-              <Bar dataKey="total" fill="#1e3a5f" radius={[0, 6, 6, 0]} name="Total spend" />
+              <Bar dataKey="total" fill={chartColors.primary} radius={[0, 6, 6, 0]} name="Total spend" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -155,14 +145,14 @@ export function DashboardPage(): JSX.Element {
           <h2 className="mb-4 font-semibold">Monthly spending — last 6 months</h2>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={trendData} margin={{ left: 8, right: 16 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#94a3b833" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
               <XAxis dataKey="label" fontSize={13} />
               <YAxis tickFormatter={(value: number) => formatCurrency(value, currency)} fontSize={12} width={90} />
               <Tooltip formatter={(value) => formatCurrency(Number(value), currency)} />
               <Line
                 type="monotone"
                 dataKey="total"
-                stroke="#1e3a5f"
+                stroke={chartColors.primary}
                 strokeWidth={2.5}
                 dot={{ r: 4 }}
                 name="Spend"
@@ -177,7 +167,7 @@ export function DashboardPage(): JSX.Element {
             <PieChart>
               <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={95} paddingAngle={3}>
                 {pieData.map((entry) => (
-                  <Cell key={entry.status} fill={STATUS_COLORS[entry.status]} />
+                  <Cell key={entry.status} fill={statusColors[entry.status]} />
                 ))}
               </Pie>
               <Tooltip />
@@ -190,14 +180,14 @@ export function DashboardPage(): JSX.Element {
           <h2 className="mb-4 font-semibold">Cash flow — next 30 days</h2>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={cashflowData} margin={{ left: 8, right: 16 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#94a3b833" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
               <XAxis dataKey="label" fontSize={12} interval={6} />
               <YAxis tickFormatter={(value: number) => formatCurrency(value, currency)} fontSize={12} width={90} />
               <Tooltip formatter={(value) => formatCurrency(Number(value), currency)} />
               <Line
                 type="stepAfter"
                 dataKey="cumulative"
-                stroke="#486581"
+                stroke={chartColors.secondary}
                 strokeWidth={2.5}
                 dot={false}
                 name="Cumulative due"

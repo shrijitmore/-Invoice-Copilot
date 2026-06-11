@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { AlertTriangle, Bell, CalendarClock, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import { api, getErrorMessage } from '../../lib/api';
 import { cn } from '../../lib/utils';
 import type { AppNotification, NotificationType } from '../../types/api';
@@ -56,18 +57,7 @@ export function NotificationBell(): JSX.Element {
     onError: (error) => toast.error(getErrorMessage(error)),
   });
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-    const onClickOutside = (event: MouseEvent): void => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', onClickOutside);
-    return () => document.removeEventListener('mousedown', onClickOutside);
-  }, [open]);
+  useClickOutside(containerRef, () => setOpen(false), open);
 
   const unread = countData?.count ?? 0;
 

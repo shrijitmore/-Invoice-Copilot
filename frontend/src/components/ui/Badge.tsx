@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { STATUS_LABELS } from '../../lib/constants';
 import { cn } from '../../lib/utils';
 import type { InvoiceStatus } from '../../types/api';
 
@@ -34,15 +35,9 @@ const statusTones: Record<InvoiceStatus, Tone> = {
   overdue: 'red',
 };
 
-const statusLabels: Record<InvoiceStatus, string> = {
-  paid: 'Paid',
-  unpaid: 'Unpaid',
-  overdue: 'Overdue',
-};
-
 /**
  * Invoice status pill with the canonical color per status.
  */
 export function StatusBadge({ status }: { status: InvoiceStatus }): JSX.Element {
-  return <Badge tone={statusTones[status]}>{statusLabels[status]}</Badge>;
+  return <Badge tone={statusTones[status]}>{STATUS_LABELS[status]}</Badge>;
 }

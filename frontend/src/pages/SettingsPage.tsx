@@ -9,20 +9,8 @@ import { Input, Select } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { useAuth } from '../context/AuthContext';
 import { api, downloadFile, getErrorMessage } from '../lib/api';
+import { CURRENCY_LABELED_OPTIONS, DATE_FORMAT_OPTIONS } from '../lib/constants';
 import type { Currency, DateFormat, UserProfile, UserSettings } from '../types/api';
-
-const CURRENCY_OPTIONS: Array<{ value: Currency; label: string }> = [
-  { value: 'USD', label: 'US Dollar (USD)' },
-  { value: 'EUR', label: 'Euro (EUR)' },
-  { value: 'GBP', label: 'British Pound (GBP)' },
-  { value: 'INR', label: 'Indian Rupee (INR)' },
-];
-
-const DATE_OPTIONS: Array<{ value: DateFormat; label: string }> = [
-  { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY (06/15/2026)' },
-  { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY (15/06/2026)' },
-  { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD (2026-06-15)' },
-];
 
 /**
  * Toggle switch with an accessible label.
@@ -133,7 +121,7 @@ export function SettingsPage(): JSX.Element {
             label="Currency"
             value={user.settings.currency}
             onChange={(event) => updateSettings.mutate({ currency: event.target.value as Currency })}
-            options={CURRENCY_OPTIONS}
+            options={[...CURRENCY_LABELED_OPTIONS]}
           />
           <Select
             label="Date format"
@@ -141,7 +129,7 @@ export function SettingsPage(): JSX.Element {
             onChange={(event) =>
               updateSettings.mutate({ dateFormat: event.target.value as DateFormat })
             }
-            options={DATE_OPTIONS}
+            options={[...DATE_FORMAT_OPTIONS]}
           />
         </div>
       </Card>

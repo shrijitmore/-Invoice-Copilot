@@ -11,6 +11,7 @@ import { Modal } from '../components/ui/Modal';
 import { Skeleton } from '../components/ui/Skeleton';
 import { useAuth } from '../context/AuthContext';
 import { api, getErrorMessage } from '../lib/api';
+import { CURRENCY_SELECT_OPTIONS } from '../lib/constants';
 import { formatCurrency, formatDate } from '../lib/format';
 import type { Invoice } from '../types/api';
 
@@ -202,7 +203,7 @@ export function InvoiceDetailPage(): JSX.Element {
                 label="Currency"
                 value={edit.currency}
                 onChange={(event) => setEdit({ ...edit, currency: event.target.value })}
-                options={['USD', 'EUR', 'GBP', 'INR'].map((code) => ({ value: code, label: code }))}
+                options={CURRENCY_SELECT_OPTIONS}
               />
               <Input
                 label="Subtotal"

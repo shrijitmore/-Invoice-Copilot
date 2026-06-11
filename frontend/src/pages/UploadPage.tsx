@@ -134,7 +134,9 @@ export function UploadPage(): JSX.Element {
           </p>
         </div>
         <Card className="p-6">
+          {/* Keyed per queue item so form state resets between extractions. */}
           <ExtractionReviewForm
+            key={`${current.label}-${reviewQueue.length}`}
             data={current.data}
             onSaved={onReviewSaved}
             onCancel={onReviewCancelled}

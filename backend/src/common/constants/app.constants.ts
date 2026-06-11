@@ -7,6 +7,30 @@ export const REFRESH_TOKEN_COOKIE = 'refresh_token';
 /** Header used to propagate a unique id for request tracing. */
 export const REQUEST_ID_HEADER = 'x-request-id';
 
+/** Access-token cookie lifetime; must match JWT_ACCESS_EXPIRES_IN. */
+export const ACCESS_TOKEN_TTL_MS = 15 * 60 * 1000;
+
+/** Refresh-token cookie lifetime; must match JWT_REFRESH_EXPIRES_IN. */
+export const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** Sliding window for rate limiting (15 minutes). */
+export const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+
+/** Requests allowed per window per IP, API-wide. */
+export const RATE_LIMIT_GLOBAL_MAX = 100;
+
+/** Requests allowed per window per IP on auth endpoints. */
+export const RATE_LIMIT_AUTH_MAX = 10;
+
+/** Title given to a chat session before its first message names it. */
+export const DEFAULT_CHAT_TITLE = 'New chat';
+
+/** Maximum characters of the first message used as an auto-title. */
+export const CHAT_AUTO_TITLE_LENGTH = 60;
+
+/** Upper bound of rows in a CSV export. */
+export const CSV_EXPORT_MAX_ROWS = 10_000;
+
 /** Maximum accepted upload size for invoice documents (10 MB). */
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 

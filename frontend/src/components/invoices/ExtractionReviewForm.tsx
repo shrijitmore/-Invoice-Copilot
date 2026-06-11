@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AlertTriangle, Plus, Trash2 } from 'lucide-react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import { useDebounce } from '../../hooks/useDebounce';
 import { api, getErrorMessage } from '../../lib/api';
+import { CURRENCY_SELECT_OPTIONS } from '../../lib/constants';
 import type {
   DuplicateCheckResult,
   ExtractionResponse,
@@ -26,14 +28,15 @@ interface FormState {
 }
 
 export interface ExtractionReviewFormProps {
-  /** AI extraction to prefill from. */
+  /**
+   * AI extraction to prefill from. Render with a `key` per extraction so
+   * the form state resets naturally between queue items.
+   */
   data: ExtractionResponse;
   /** Called with the saved invoice. */
   onSaved: (invoice: Invoice) => void;
   onCancel: () => void;
 }
-
-const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'INR'].map((code) => ({ value: code, label: code }));
 
 function toFormState(data: ExtractionResponse): FormState {
   const { extraction } = data;
@@ -58,31 +61,23 @@ function toFormState(data: ExtractionResponse): FormState {
  */
 export function ExtractionReviewForm({ data, onSaved, onCancel }: ExtractionReviewFormProps): JSX.Element {
   const [form, setForm] = useState<FormState>(() => toFormState(data));
-  const [duplicate, setDuplicate] = useState<DuplicateCheckResult | null>(null);
 
-  useEffect(() => {
-    setForm(toFormState(data));
-    setDuplicate(null);
-  }, [data]);
-
-  // Probe for duplicates whenever vendor + amount are both present.
-  useEffect(() => {
-    const amount = Number(form.amount);
-    if (!form.vendorName.trim() || !Number.isFinite(amount) || amount <= 0) {
-      setDuplicate(null);
-      return;
-    }
-    const timer = window.setTimeout(() => {
-      void api
-        .post<DuplicateCheckResult>('/invoices/check-duplicate', {
-          vendorName: form.vendorName.trim(),
-          amount,
+  // Duplicate probe: declarative query keyed on the debounced vendor+amount.
+  const probeVendor = useDebounce(form.vendorName.trim(), 400);
+  const probeAmount = Number(useDebounce(form.amount, 400));
+  const probeEnabled = probeVendor.length > 0 && Number.isFinite(probeAmount) && probeAmount > 0;
+  const { data: duplicate } = useQuery({
+    queryKey: ['invoices', 'duplicate-check', probeVendor, probeAmount],
+    queryFn: async () =>
+      (
+        await api.post<DuplicateCheckResult>('/invoices/check-duplicate', {
+          vendorName: probeVendor,
+          amount: probeAmount,
         })
-        .then((response) => setDuplicate(response.data))
-        .catch(() => setDuplicate(null));
-    }, 400);
-    return () => window.clearTimeout(timer);
-  }, [form.vendorName, form.amount]);
+      ).data,
+    enabled: probeEnabled,
+    staleTime: 60_000,
+  });
 
   const set = (patch: Partial<FormState>): void => setForm((current) => ({ ...current, ...patch }));
 
@@ -146,7 +141,7 @@ export function ExtractionReviewForm({ data, onSaved, onCancel }: ExtractionRevi
         </div>
       )}
 
-      {duplicate?.isDuplicate && (
+      {probeEnabled && duplicate?.isDuplicate && (
         <div className="rounded-lg border border-red-300 bg-red-50 p-4 dark:border-red-700 dark:bg-red-900/30">
           <p className="flex items-center gap-2 font-medium text-red-800 dark:text-red-300">
             <AlertTriangle className="h-4 w-4" aria-hidden />
@@ -184,7 +179,7 @@ export function ExtractionReviewForm({ data, onSaved, onCancel }: ExtractionRevi
           label="Currency"
           value={form.currency}
           onChange={(event) => set({ currency: event.target.value })}
-          options={CURRENCY_OPTIONS}
+          options={CURRENCY_SELECT_OPTIONS}
         />
         <Input
           label="Subtotal"

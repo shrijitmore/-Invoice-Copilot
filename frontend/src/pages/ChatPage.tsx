@@ -13,6 +13,7 @@ import { Skeleton } from '../components/ui/Skeleton';
 import { useDebounce } from '../hooks/useDebounce';
 import { useChatStream } from '../hooks/useChatStream';
 import { api, getErrorMessage } from '../lib/api';
+import { MAX_CHAT_MESSAGE_LENGTH } from '../lib/constants';
 import { cn } from '../lib/utils';
 import type { ChatMessage, ChatSession } from '../types/api';
 
@@ -251,7 +252,7 @@ export function ChatPage(): JSX.Element {
                 }
               }}
               rows={1}
-              maxLength={4000}
+              maxLength={MAX_CHAT_MESSAGE_LENGTH}
               placeholder="Ask about your invoices…"
               aria-label="Message"
               className="max-h-40 min-h-[48px] flex-1 resize-y rounded-xl border border-slate-300 bg-white px-4 py-3 text-base focus:border-navy-500 dark:border-slate-600 dark:bg-slate-800"

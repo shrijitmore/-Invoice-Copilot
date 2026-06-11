@@ -15,7 +15,11 @@ import { Throttle } from '@nestjs/throttler';
 import type { CookieOptions, Request, Response } from 'express';
 import {
   ACCESS_TOKEN_COOKIE,
+  ACCESS_TOKEN_TTL_MS,
+  RATE_LIMIT_AUTH_MAX,
+  RATE_LIMIT_WINDOW_MS,
   REFRESH_TOKEN_COOKIE,
+  REFRESH_TOKEN_TTL_MS,
 } from '../common/constants/app.constants';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Public } from '../common/decorators/public.decorator';
@@ -25,7 +29,7 @@ import { AuthService } from './auth.service';
 import type { GoogleProfile } from './strategies/google.strategy';
 import type { TokenPair } from './token.service';
 
-const AUTH_THROTTLE = { default: { limit: 10, ttl: 15 * 60 * 1000 } };
+const AUTH_THROTTLE = { default: { limit: RATE_LIMIT_AUTH_MAX, ttl: RATE_LIMIT_WINDOW_MS } };
 
 /**
  * Authentication endpoints: Google OAuth flow, token refresh, logout and
@@ -120,8 +124,8 @@ export class AuthController {
   }
 
   private setAuthCookies(res: Response, pair: TokenPair): void {
-    res.cookie(ACCESS_TOKEN_COOKIE, pair.accessToken, this.cookieOptions(15 * 60 * 1000));
-    res.cookie(REFRESH_TOKEN_COOKIE, pair.refreshToken, this.cookieOptions(7 * 24 * 60 * 60 * 1000));
+    res.cookie(ACCESS_TOKEN_COOKIE, pair.accessToken, this.cookieOptions(ACCESS_TOKEN_TTL_MS));
+    res.cookie(REFRESH_TOKEN_COOKIE, pair.refreshToken, this.cookieOptions(REFRESH_TOKEN_TTL_MS));
   }
 
   private clearAuthCookies(res: Response): void {

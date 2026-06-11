@@ -1,11 +1,12 @@
 import { useRef, useState, type DragEvent } from 'react';
 import { UploadCloud } from 'lucide-react';
 import toast from 'react-hot-toast';
+import {
+  ACCEPTED_INVOICE_MIME_TYPES,
+  MAX_BULK_FILES,
+  MAX_UPLOAD_BYTES,
+} from '../../lib/constants';
 import { cn } from '../../lib/utils';
-
-const ACCEPTED_TYPES = ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'];
-const MAX_BYTES = 10 * 1024 * 1024;
-const MAX_FILES = 10;
 
 export interface UploadDropzoneProps {
   onFiles: (files: File[]) => void;
@@ -26,17 +27,17 @@ export function UploadDropzone({ onFiles, disabled = false }: UploadDropzoneProp
       return;
     }
     const files = Array.from(incoming);
-    if (files.length > MAX_FILES) {
-      toast.error(`You can upload up to ${MAX_FILES} files at once.`);
+    if (files.length > MAX_BULK_FILES) {
+      toast.error(`You can upload up to ${MAX_BULK_FILES} files at once.`);
       return;
     }
     const valid: File[] = [];
     for (const file of files) {
-      if (!ACCEPTED_TYPES.includes(file.type)) {
+      if (!ACCEPTED_INVOICE_MIME_TYPES.includes(file.type)) {
         toast.error(`"${file.name}" isn't supported. Use PDF, PNG, JPEG or WebP.`);
         continue;
       }
-      if (file.size > MAX_BYTES) {
+      if (file.size > MAX_UPLOAD_BYTES) {
         toast.error(`"${file.name}" is over 10 MB.`);
         continue;
       }

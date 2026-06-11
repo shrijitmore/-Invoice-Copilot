@@ -8,6 +8,10 @@ import { AiModule } from './ai/ai.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
+import {
+  RATE_LIMIT_GLOBAL_MAX,
+  RATE_LIMIT_WINDOW_MS,
+} from './common/constants/app.constants';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -38,9 +42,11 @@ import { UsersModule } from './users/users.module';
         uri: configService.getOrThrow<string>('mongodbUri'),
       }),
     }),
-    // Global limit: 100 requests / 15 minutes / IP. Auth routes override
-    // with a stricter 10 / 15 minutes via @Throttle.
-    ThrottlerModule.forRoot([{ name: 'default', ttl: 15 * 60 * 1000, limit: 100 }]),
+    // Global limit per IP; auth routes override with a stricter limit
+    // via @Throttle (see RATE_LIMIT_AUTH_MAX).
+    ThrottlerModule.forRoot([
+      { name: 'default', ttl: RATE_LIMIT_WINDOW_MS, limit: RATE_LIMIT_GLOBAL_MAX },
+    ]),
     ScheduleModule.forRoot(),
     AuthModule,
     UsersModule,
